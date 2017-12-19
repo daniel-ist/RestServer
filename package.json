@@ -1,34 +1,24 @@
 {
-  "name": "cordova-RestServer",
-  "version": "1.0",
-  "description": "Basic Server plugin which can be embeded inside your cordova/ionic app.",
-  "cordova": {
-    "id": "cordova-RestServer",
-    "platforms": [
-      "android",
-      "ios"
-    ]
+  "name": "cordova-restserver",
+  "version": "1.0.0",
+  "description": "Basic Server which can be embeded inside your cordova/ionic app.",
+  "main": "index.js",
+  "scripts": {
+    "test": "cordova run android"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/daniel-ist/cordova-RestServer.git"
   },
   "keywords": [
-    "Webserver",
-    "Rest",
-    "Webservices",
-    "cordova-android",
-    "cordova-ios"
-  ],
-  "engines": [
-    {
-      "name": "cordova",
-      "version": ">=3.0.0"
-    }
+    "webserver",
+    "webservices",
+    "rest"
   ],
   "author": "Daniel Castro",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/daniel-ist/cordova-RestServer/issues"
   },
-  "homepage": "https://github.com/daniel-ist/cordova-RestServer"
+  "homepage": "https://github.com/daniel-ist/cordova-RestServer#readme"
 }
