@@ -1,24 +1,22 @@
 {
-  "name": "cordova-restserver",
+  "name": "cordova-httpd",
   "version": "1.0.0",
-  "description": "Basic Server which can be embeded inside your cordova/ionic app.",
+  "description": "Supported platform:\r * iOS\r * Android",
   "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    "test": "cordova run android"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/daniel-ist/cordova-RestServer.git"
+    "url": "git+https://github.com/floatinghotpot/cordova-httpd.git"
   },
-  "keywords": [
-    "webserver",
-    "webservices",
-    "rest"
-  ],
-  "author": "Daniel Castro",
+  "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/daniel-ist/cordova-RestServer/issues"
+    "url": "https://github.com/floatinghotpot/cordova-httpd/issues"
   },
-  "homepage": "https://github.com/daniel-ist/cordova-RestServer#readme"
+  "homepage": "https://github.com/floatinghotpot/cordova-httpd#readme"
 }
