@@ -1,22 +1,65 @@
 {
-  "name": "cordova-httpd",
-  "version": "1.0.0",
+  "_args": [
+    [
+      {
+        "raw": "C:\\Users\\danie\\Desktop\\Projectos\\servidor2\\cordova-httpd",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "C:\\Users\\danie\\Desktop\\Projectos\\servidor2\\cordova-httpd",
+        "spec": "C:\\Users\\danie\\Desktop\\Projectos\\servidor2\\cordova-httpd",
+        "type": "directory"
+      },
+      "C:\\Users\\danie\\Desktop\\Projectos\\servidor5\\servidor5\\node_modules"
+    ]
+  ],
+  "_from": "..\\..\\servidor2\\cordova-httpd",
+  "_id": "cordova-httpd@1.0.0",
+  "_inCache": true,
+  "_location": "/cordova-httpd",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "C:\\Users\\danie\\Desktop\\Projectos\\servidor2\\cordova-httpd",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "C:\\Users\\danie\\Desktop\\Projectos\\servidor2\\cordova-httpd",
+    "spec": "C:\\Users\\danie\\Desktop\\Projectos\\servidor2\\cordova-httpd",
+    "type": "directory"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "file:..\\..\\servidor2\\cordova-httpd",
+  "_shasum": "1fcac3a19a18613e06a7e4cefe85762fc531ef36",
+  "_shrinkwrap": null,
+  "_spec": "C:\\Users\\danie\\Desktop\\Projectos\\servidor2\\cordova-httpd",
+  "_where": "C:\\Users\\danie\\Desktop\\Projectos\\servidor5\\servidor5\\node_modules",
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/floatinghotpot/cordova-httpd/issues"
+  },
+  "dependencies": {},
   "description": "Supported platform:\r * iOS\r * Android",
-  "main": "index.js",
+  "devDependencies": {},
   "directories": {
     "test": "test"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "gitHead": "78b9818516842650a9bd59881cbb543db2848d29",
+  "homepage": "https://github.com/floatinghotpot/cordova-httpd#readme",
+  "license": "ISC",
+  "main": "index.js",
+  "name": "cordova-httpd",
+  "optionalDependencies": {},
+  "readme": "## CorHttpd: embeded httpd for cordova ##\r\n\r\nSupported platform:\r\n* iOS\r\n* Android\r\n\r\nYou can browse (locally or remotely) to access files in android/ios phone/pad:\r\n\r\n* browse the files in mobile device with a browser in PC.\r\n* copy files from mobile device to PC quickly, just with Wifi.\r\n* use cordova webview to access the assets/www/ content with http protocol.\r\n\r\nWhy http access is good?\r\n\r\n* Use wifi instead of cable, more convenient.\r\n* For security reason, browser does not support local AJAX calls. It's big bottle neck to deploy HTML5 games to Cordova platform. \r\n* The most popular phaser.js game engine, a httpd is always required, as it use AJAX to load resource. \r\n\r\n## How to use CorHttpd? ##\r\n\r\nAdd the plugin to your cordova project:\r\n\r\n    cordova plugin add https://github.com/floatinghotpot/cordova-httpd.git\r\n\r\nQuick start, copy the demo files, and just build to play.\r\n\r\n    cp -r plugins/com.rjfun.cordova.httpd/test/* www/\r\n    \r\n## Javascript APIs ##\r\n\r\n```javascript\r\n\r\nstartServer( options, success_callback, error_callback );\r\n\r\nstopServer( success_callback, error_callback );\r\n\r\ngetURL( success_callback, error_callback );\r\n\r\ngetLocalPath( success_callback, error_callback );\r\n```\r\n\r\nExample code: (read the comments)\r\n\r\n```javascript\r\n    var httpd = null;\r\n    function onDeviceReady() {\r\n        httpd = ( cordova && cordova.plugins && cordova.plugins.CorHttpd ) ? cordova.plugins.CorHttpd : null;\r\n    }\r\n    function updateStatus() {\r\n    \tdocument.getElementById('location').innerHTML = \"document.location.href: \" + document.location.href;\r\n    \tif( httpd ) {\r\n    \t  /* use this function to get status of httpd\r\n    \t  * if server is up, it will return http://<server's ip>:port/\r\n    \t  * if server is down, it will return empty string \"\"\r\n    \t  */\r\n    \t\thttpd.getURL(function(url){\r\n    \t\t\tif(url.length > 0) {\r\n    \t\t\t\tdocument.getElementById('url').innerHTML = \"server is up: <a href='\" + url + \"' target='_blank'>\" + url + \"</a>\";\r\n    \t\t\t} else {\r\n    \t\t\t\tdocument.getElementById('url').innerHTML = \"server is down.\";\r\n    \t\t\t}\r\n    \t\t});\r\n    \t\t// call this function to retrieve the local path of the www root dir\r\n    \t\thttpd.getLocalPath(function(path){\r\n    \t\t\tdocument.getElementById('localpath').innerHTML = \"<br/>localPath: \" + path;\r\n        \t});\r\n    \t} else {\r\n    \t\talert('CorHttpd plugin not available/ready.');\r\n    \t}\r\n    }\r\n    function startServer( wwwroot ) {\r\n    \tif ( httpd ) {\r\n    \t    // before start, check whether its up or not\r\n    \t    httpd.getURL(function(url){\r\n    \t    \tif(url.length > 0) {\r\n    \t    \t\tdocument.getElementById('url').innerHTML = \"server is up: <a href='\" + url + \"' target='_blank'>\" + url + \"</a>\";\r\n\t    \t    } else {\r\n\t    \t        /* wwwroot is the root dir of web server, it can be absolute or relative path\r\n\t    \t        * if a relative path is given, it will be relative to cordova assets/www/ in APK.\r\n\t    \t        * \"\", by default, it will point to cordova assets/www/, it's good to use 'htdocs' for 'www/htdocs'\r\n\t    \t        * if a absolute path is given, it will access file system.\r\n\t    \t        * \"/\", set the root dir as the www root, it maybe a security issue, but very powerful to browse all dir\r\n\t    \t        */\r\n    \t    \t    httpd.startServer({\r\n    \t    \t    \t'www_root' : wwwroot,\r\n    \t    \t    \t'port' : 8080,\r\n    \t    \t    \t'localhost_only' : false\r\n    \t    \t    }, function( url ){\r\n    \t    \t      // if server is up, it will return the url of http://<server ip>:port/\r\n    \t    \t      // the ip is the active network connection\r\n    \t    \t      // if no wifi or no cell, \"127.0.0.1\" will be returned.\r\n        \t    \t\tdocument.getElementById('url').innerHTML = \"server is started: <a href='\" + url + \"' target='_blank'>\" + url + \"</a>\";\r\n    \t    \t    }, function( error ){\r\n    \t    \t    \tdocument.getElementById('url').innerHTML = 'failed to start server: ' + error;\r\n    \t    \t    });\r\n    \t    \t}\r\n    \t    \t\r\n    \t    });\r\n    \t} else {\r\n    \t\talert('CorHttpd plugin not available/ready.');\r\n    \t}\r\n    }\r\n    function stopServer() {\r\n    \tif ( httpd ) {\r\n    \t    // call this API to stop web server\r\n    \t    httpd.stopServer(function(){\r\n    \t    \tdocument.getElementById('url').innerHTML = 'server is stopped.';\r\n    \t    },function( error ){\r\n    \t    \tdocument.getElementById('url').innerHTML = 'failed to stop server' + error;\r\n    \t    });\r\n    \t} else {\r\n    \t\talert('CorHttpd plugin not available/ready.');\r\n    \t}\r\n    }\r\n```\r\n\r\n# Credits #\r\n\r\nThis Cordova plugin is built based on following 2 projects, and thanks to the authors.\r\n\r\n* [NanoHTTPD](https://github.com/NanoHttpd/nanohttpd), written in java, for java / android, by psh.\r\n* [CocoaHTTPServer](https://github.com/robbiehanson/CocoaHTTPServer), written in Obj-C, for iOS / Mac OS X, by robbiehanson.\r\n\r\nYou can use this plugin for FREE. Feel free to fork, improve and send pull request. \r\n\r\nIf need prompt support, please [buy a license](http://rjfun.github.io/), you will be supported with high priority.\r\n\r\nMore Cordova/PhoneGap plugins by Raymond Xie, [find them in plugin registry](http://plugins.cordova.io/#/search?search=rjfun).\r\n\r\nProject outsourcing and consulting service is also available. Please [contact us](mailto:rjfun.mobile@gmail.com) if you have the business needs.\r\n\r\n",
+  "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/floatinghotpot/cordova-httpd.git"
   },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/floatinghotpot/cordova-httpd/issues"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/floatinghotpot/cordova-httpd#readme"
+  "version": "1.0.0"
 }

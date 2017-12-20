@@ -111,7 +111,7 @@ public class NanoHTTPD
      * @return
      */
 
-     
+     //FALTA POR AQUI O HEADER (VER NO CODIGO ANTERIOR)
     private JSONObject createJSONRequest(String requestId, String uri, Properties header) throws JSONException {
         JSONObject jsonRequest = new JSONObject();
         jsonRequest.put("headers", header);
@@ -137,13 +137,35 @@ public class NanoHTTPD
 	@SuppressWarnings("rawtypes")
 	public Response serve( String uri, String method, Properties header, Properties parms, Properties files )
 	{
-		// Here detects if your URL starts with "/files" which means you're serving a file from htdocs folder or
-		// if you are serving webservices from your index.html file
-		if(uri.startsWith("/files")){
-			return serveFile( uri, header, myRootDir, true );
-		}else{
-			return serveJavascript( uri, header, myRootDir, true );
+		Log.i( LOGTAG, method + " '" + uri + "' " );
+		Log.d(this.getClass().getName(), "danielLog entrou serve() NanoHTTPD.java, uri:" + uri);
+
+	
+/*
+		Enumeration e = header.propertyNames();
+		while ( e.hasMoreElements())
+		{
+			String value = (String)e.nextElement();
+			Log.i( LOGTAG, "  HDR: '" + value + "' = '" + header.getProperty( value ) + "'" );
 		}
+		
+		e = parms.propertyNames();
+		while ( e.hasMoreElements())
+		{
+			String value = (String)e.nextElement();
+			Log.i( LOGTAG, "  PRM: '" + value + "' = '" + parms.getProperty( value ) + "'" );
+		}
+		
+		e = files.propertyNames();
+		while ( e.hasMoreElements())
+		{
+			String value = (String)e.nextElement();
+			Log.i( LOGTAG, "  UPLOADED: '" + value + "' = '" + files.getProperty( value ) + "'" );
+		}
+*/
+
+		return serveJavascript( uri, header, myRootDir, true );
+	//	return serveFile( uri, header, myRootDir, true );
 	}
 
 	/**
@@ -337,6 +359,10 @@ public class NanoHTTPD
 	 */
 	public static void main( String[] args )
 	{
+		//Log.d(this.getClass().getName(), "danielLog main NanoHTTPD.java");
+		//Log.d("danielLog main NanoHTTPD.java");
+		Log.i( "NanoHTTPD", "danielLog estou no main" );
+	//	CorHttpd corhttpd = new CorHttpd();
 		PrintStream myOut = System.out;
 		PrintStream myErr = System.err;
 		
@@ -362,6 +388,7 @@ public class NanoHTTPD
 		try
 		{
 			new NanoHTTPD( port, new AndroidFile(wwwroot.getPath()) , null);
+			//Log.d(this.getClass().getName(), "danielLog main: try NanoHTTPD.java");
 		}
 		catch( IOException ioe )
 		{
@@ -948,35 +975,61 @@ public class NanoHTTPD
 	 */
 
 
+
+
+
+
+
 	public Response serveJavascript( String uri, Properties header, AndroidFile homeDir,
 			boolean allowDirectoryListing )
 	{
-		
+		Log.d(this.getClass().getName(), "danielLog entrou serveJavascript() NanoHTTPD.java");
 		Response res = null;
+		
+
+
 		String requestUUID = UUID.randomUUID().toString();
 
 		PluginResult pluginResult = null;
         try {
 
+
             //Aqui cria o JSON com informação do request
+        	Log.d(this.getClass().getName(), "danielLog serveFile: try new pluginResult NanoHTTPD.java");
             pluginResult = new PluginResult(
                     PluginResult.Status.OK, this.createJSONRequest(requestUUID, uri, header));
+
+            Log.d(this.getClass().getName(), "danielLog NanoHTTPD.java, pluginResult:" + pluginResult.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        	Log.d(this.getClass().getName(), "danielLog antes setKeepCallback NanoHTTPD.java");
+
         pluginResult.setKeepCallback(true);
+        	//Log.d(this.getClass().getName(), "danielLog onRequestCallbackContext:" + this.corhttpd.onRequestCallbackContext.toString());
+        	Log.d(this.getClass().getName(), "danielLogxxxxx depois setKeepCallback NanoHTTPD.java");
+        	//Log.d(this.getClass().getName(), "danielLog onRequestCallbackContext:" + this.corhttpd.onRequestCallbackContext.toString());
+
         this.corhttpd.onRequestCallbackContext.sendPluginResult(pluginResult);
 
+        Log.d(this.getClass().getName(), "danielLog serveFile() NanoHTTPD.java, depois sendPluginResult");
+		Log.d(this.getClass().getName(), "danielLog onRequestCallbackContext:" + this.corhttpd.onRequestCallbackContext.toString());
+
         while (!this.corhttpd.responses.containsKey(requestUUID)) {
+        	Log.d(this.getClass().getName(), " while !responses NanoHTTPD.java");
             try {
+            	Log.d(this.getClass().getName(), " antes thread.sleep(1) NanoHTTPD.java");
                 Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
-        //CRIA UMA NOVA RESPONSE
+
+        //ACHO QUE É AQUI QUE ESTÁ A CRIAR UMA NOVA RESPONSE
+        Log.d(this.getClass().getName(), "danielLog serveFile() antes criar responseObject, NanoHTTPD.java");
         JSONObject responseObject = (JSONObject) this.corhttpd.responses.get(requestUUID);
+        Log.d(this.getClass().getName(), "responseObject: " + responseObject.toString());
         Response response = null;
 
          try{
@@ -984,6 +1037,7 @@ public class NanoHTTPD
          	InputStream inputDataStream = new ByteArrayInputStream(dataBody.getBytes());
 
          	response = new Response(
+                //Response.status.lookup(responseObject.getInt("status")),
                 HTTP_OK,
                 "text/plain",
                 inputDataStream
@@ -992,6 +1046,8 @@ public class NanoHTTPD
             Iterator<?> keys = responseObject.getJSONObject("headers").keys();
             while (keys.hasNext()) {
                 String key = (String) keys.next();
+                Log.d(this.getClass().getName(), "key: " + key);
+                Log.d(this.getClass().getName(), "responseObject: " + responseObject.toString());
                 response.addHeader(
                     key,
                     responseObject.getJSONObject("headers").getString(key)
@@ -1000,11 +1056,14 @@ public class NanoHTTPD
          }catch (JSONException e) {
              e.printStackTrace();
          }
+
+        Log.d(this.getClass().getName(), "danielLog main NanoHTTPD.java");
         return response;
+
+
 	}
 
-	// !! ServeFile() -->>> Não está a ser usado neste momento uma vez que todos os pedidos são encaminhados para o index.html que retorna uma
-	// response genérica, que o programador irá editar consoante os serviços que pretender !!
+
 	public Response serveFile( String uri, Properties header, AndroidFile homeDir,
 			boolean allowDirectoryListing )
 	{

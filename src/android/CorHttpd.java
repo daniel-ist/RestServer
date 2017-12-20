@@ -56,7 +56,7 @@ public class CorHttpd extends CordovaPlugin {
 	public WebServer server = null;
 	private String	url = "";
 
-    
+    //tirei do codigo do plugin nodejs
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
@@ -92,6 +92,9 @@ public class CorHttpd extends CordovaPlugin {
 
         return false;  // Returning false results in a "MethodNotFound" error.
     }
+
+
+
 
     @Override
     public boolean execute(String action, JSONArray inputs, CallbackContext callbackContext) throws JSONException {
@@ -237,12 +240,15 @@ public class CorHttpd extends CordovaPlugin {
 
             PluginResult res = new PluginResult(PluginResult.Status.OK);
             callbackContext.sendPluginResult( res);
+
         }
         return null;
     }
 
 
     private String __startServer() {
+
+        Log.d(this.getClass().getName(), "daniel Entrou no startServer corhttpd.java");
 
     	String errmsg = "";
     	try {
@@ -258,11 +264,20 @@ public class CorHttpd extends CordovaPlugin {
     		} else {
     			server = new WebServer(port, f, this);
     		}
+        	Log.d(this.getClass().getName(), "daniel criou com sucesso htpd");
+
+
+        		//vou por aqui new nanohttpd(...)
+
+        	//nanoHTTPD = new NanoHTTPD( port, f , this);
+			Log.d(this.getClass().getName(), "danielLog criou nanohttpd com sucesso linha: 234 corhttpd.java");
 
 		} catch (IOException e) {
 			errmsg = String.format("IO Exception: %s", e.getMessage());
 			Log.w(LOGTAG, errmsg);
+	
 		}
+
     	return errmsg;
     }
 
@@ -282,6 +297,7 @@ public class CorHttpd extends CordovaPlugin {
 
     private PluginResult getLocalPath(JSONArray inputs, CallbackContext callbackContext) {
 		Log.w(LOGTAG, "getLocalPath");
+		
     	callbackContext.success( this.localPath );
         return null;
     }
@@ -336,6 +352,7 @@ public class CorHttpd extends CordovaPlugin {
      */
     private void onRequest(JSONArray args, CallbackContext callbackContext) {
         this.onRequestCallbackContext = callbackContext;
+        Log.d(this.getClass().getName(), "danielLog onrequest (CorHttpd.java): " + args.toString() + onRequestCallbackContext);
         PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
         pluginResult.setKeepCallback(true);
         this.onRequestCallbackContext.sendPluginResult(pluginResult);
@@ -349,6 +366,7 @@ public class CorHttpd extends CordovaPlugin {
      * @throws JSONException
      */
     private void sendResponse(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        Log.d(this.getClass().getName(), "danielLog    Got sendResponse: " + args.toString() + callbackContext);
         this.responses.put(args.getString(0), args.get(1));
         callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
     }
