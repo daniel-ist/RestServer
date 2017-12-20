@@ -1,12 +1,5 @@
 package com.rjfun.cordova.httpd;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-import java.util.UUID;
-import org.apache.cordova.PluginResult;
-import org.apache.cordova.CallbackContext;
-import java.util.HashMap;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -21,7 +14,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URLEncoder;
-import java.util.Iterator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -81,47 +73,11 @@ import android.util.Log;
 @SuppressWarnings("unchecked")
 public class NanoHTTPD
 {
-
-
-	//WebServer webserver;
-	CorHttpd corhttpd;
-	//public CallbackContext onRequestCallbackContext;
-	//public HashMap<String, Object> responses;
-
-
 	private final String LOGTAG = "NanoHTTPD";
 	
 	// ==================================================
 	// API parts
 	// ==================================================
-
-	 /**
-     * Create a request object
-     *
-     * [
-     *      "requestId": requestUUID,
-     *"      body": request.jsonObject ?? "",
-     *"      headers": request.headers,
-     *"      method": request.method,
-     *"      path": request.url.path,
-     *"      query": request.url.query ?? ""
-     *  ]
-     *
-     * @param session
-     * @return
-     */
-
-     //FALTA POR AQUI O HEADER (VER NO CODIGO ANTERIOR)
-    private JSONObject createJSONRequest(String requestId, String uri, Properties header) throws JSONException {
-        JSONObject jsonRequest = new JSONObject();
-        jsonRequest.put("headers", header);
-        jsonRequest.put("requestId", requestId);
-        jsonRequest.put("path", uri);
-
-        Log.d(this.getClass().getName(), "danielLog criou json request");
-     
-        return jsonRequest;
-    }
 
 	/**
 	 * Override this to customize the server.<p>
@@ -138,9 +94,6 @@ public class NanoHTTPD
 	public Response serve( String uri, String method, Properties header, Properties parms, Properties files )
 	{
 		Log.i( LOGTAG, method + " '" + uri + "' " );
-		Log.d(this.getClass().getName(), "danielLog entrou serve() NanoHTTPD.java, uri:" + uri);
-
-	
 /*
 		Enumeration e = header.propertyNames();
 		while ( e.hasMoreElements())
@@ -163,9 +116,7 @@ public class NanoHTTPD
 			Log.i( LOGTAG, "  UPLOADED: '" + value + "' = '" + files.getProperty( value ) + "'" );
 		}
 */
-
-		return serveJavascript( uri, header, myRootDir, true );
-	//	return serveFile( uri, header, myRootDir, true );
+		return serveFile( uri, header, myRootDir, true );
 	}
 
 	/**
@@ -267,16 +218,13 @@ public class NanoHTTPD
 	// ==================================================
 	// Socket & server code
 	// ==================================================
-/**
+
+	/**
 	 * Starts a HTTP server to given port.<p>
 	 * Throws an IOException if the socket is already in use
 	 */
-	public NanoHTTPD(InetSocketAddress localAddr, AndroidFile wwwroot, CorHttpd s) throws IOException
+	public NanoHTTPD(InetSocketAddress localAddr, AndroidFile wwwroot) throws IOException
 	{
-		Log.d(this.getClass().getName(), "danielLog c1: entrou NanoHTTPD()");
-		this.corhttpd = s;
-
-		Log.d(this.corhttpd.getClass().getName(), "danielLog c1: depois de this.corhttpd = s ");
 		myTcpPort = localAddr.getPort();
 		myRootDir = wwwroot;
 		myServerSocket = new ServerSocket();
@@ -295,7 +243,6 @@ public class NanoHTTPD
 			}
 		});
 		myThread.setDaemon( true );
-		this.myThread.setName("NanoHttpd Main Listener");
 		myThread.start();
 	}
 	
@@ -303,12 +250,8 @@ public class NanoHTTPD
 	 * Starts a HTTP server to given port.<p>
 	 * Throws an IOException if the socket is already in use
 	 */
-	public NanoHTTPD( int port, AndroidFile wwwroot, CorHttpd s) throws IOException
-	{	
-		Log.d(this.getClass().getName(), "danielLog c2: entrou NanoHTTPD()");
-		this.corhttpd = s;
-		Log.d(this.corhttpd.getClass().getName(), "danielLog  c2: depois de this.corhttpd = s ");
- 	
+	public NanoHTTPD( int port, AndroidFile wwwroot ) throws IOException
+	{
 		myTcpPort = port;
 		this.myRootDir = wwwroot;
 		myServerSocket = new ServerSocket( myTcpPort );
@@ -318,27 +261,17 @@ public class NanoHTTPD
 			{
 				try
 				{
-					while( true ){
+					while( true )
 						new HTTPSession( myServerSocket.accept());
-						Log.d(this.getClass().getName(), "danielLog  server accept");
-					}
 				}
 				catch ( IOException ioe )
 				{}
 			}
 		});
 		myThread.setDaemon( true );
-		this.myThread.setName("NanoHttpd Main Listener");
 		myThread.start();
 	}
-	/**
-	 * Starts a HTTP server to given port.<p>
-	 * Throws an IOException if the socket is already in use
-	 */
-	/**
-	 * Starts a HTTP server to given port.<p>
-	 * Throws an IOException if the socket is already in use
-	 */
+
 	/**
 	 * Stops the server.
 	 */
@@ -359,10 +292,6 @@ public class NanoHTTPD
 	 */
 	public static void main( String[] args )
 	{
-		//Log.d(this.getClass().getName(), "danielLog main NanoHTTPD.java");
-		//Log.d("danielLog main NanoHTTPD.java");
-		Log.i( "NanoHTTPD", "danielLog estou no main" );
-	//	CorHttpd corhttpd = new CorHttpd();
 		PrintStream myOut = System.out;
 		PrintStream myErr = System.err;
 		
@@ -387,8 +316,7 @@ public class NanoHTTPD
 
 		try
 		{
-			new NanoHTTPD( port, new AndroidFile(wwwroot.getPath()) , null);
-			//Log.d(this.getClass().getName(), "danielLog main: try NanoHTTPD.java");
+			new NanoHTTPD( port, new AndroidFile(wwwroot.getPath()) );
 		}
 		catch( IOException ioe )
 		{
@@ -406,168 +334,164 @@ public class NanoHTTPD
 	 * Handles one session, i.e. parses the HTTP request
 	 * and returns the response.
 	 */
-	private class HTTPSession //implements Runnable
+	private class HTTPSession implements Runnable
 	{
 		public HTTPSession( Socket s )
 		{
 			mySocket = s;
-			Thread t = new Thread( new Runnable()
-			{
-				public void run()
-				{
-					try
-					{
-						InputStream is = mySocket.getInputStream();
-						if ( is == null) return;
-
-						// Read the first 8192 bytes.
-						// The full header should fit in here.
-						// Apache's default header limit is 8KB.
-						// Do NOT assume that a single read will get the entire header at once!
-						final int bufsize = 8192;
-						byte[] buf = new byte[bufsize];
-						int splitbyte = 0;
-						int rlen = 0;
-						{
-							int read = is.read(buf, 0, bufsize);
-							while (read > 0)
-							{
-								rlen += read;
-								splitbyte = findHeaderEnd(buf, rlen);
-								if (splitbyte > 0)
-									break;
-								read = is.read(buf, rlen, bufsize - rlen);
-							}
-						}
-
-						// Create a BufferedReader for parsing the header.
-						ByteArrayInputStream hbis = new ByteArrayInputStream(buf, 0, rlen);
-						BufferedReader hin = new BufferedReader( new InputStreamReader( hbis ));
-						Properties pre = new Properties();
-						Properties parms = new Properties();
-						Properties header = new Properties();
-						Properties files = new Properties();
-
-						// Decode the header into parms and header java properties
-						decodeHeader(hin, pre, parms, header);
-						String method = pre.getProperty("method");
-						String uri = pre.getProperty("uri");
-
-						long size = 0x7FFFFFFFFFFFFFFFl;
-						String contentLength = header.getProperty("content-length");
-						if (contentLength != null)
-						{
-							try { size = Integer.parseInt(contentLength); }
-							catch (NumberFormatException ex) {}
-						}
-
-						// Write the part of body already read to ByteArrayOutputStream f
-						ByteArrayOutputStream f = new ByteArrayOutputStream();
-						if (splitbyte < rlen)
-							f.write(buf, splitbyte, rlen-splitbyte);
-
-						// While Firefox sends on the first read all the data fitting
-						// our buffer, Chrome and Opera send only the headers even if
-						// there is data for the body. We do some magic here to find
-						// out whether we have already consumed part of body, if we
-						// have reached the end of the data to be sent or we should
-						// expect the first byte of the body at the next read.
-						if (splitbyte < rlen)
-							size -= rlen-splitbyte+1;
-						else if (splitbyte==0 || size == 0x7FFFFFFFFFFFFFFFl)
-							size = 0;
-
-						// Now read all the body and write it to f
-						buf = new byte[512];
-						while ( rlen >= 0 && size > 0 )
-						{
-							rlen = is.read(buf, 0, 512);
-							size -= rlen;
-							if (rlen > 0)
-								f.write(buf, 0, rlen);
-						}
-
-						// Get the raw body as a byte []
-						byte [] fbuf = f.toByteArray();
-
-						// Create a BufferedReader for easily reading it as string.
-						ByteArrayInputStream bin = new ByteArrayInputStream(fbuf);
-						BufferedReader in = new BufferedReader( new InputStreamReader(bin));
-
-						// If the method is POST, there may be parameters
-						// in data section, too, read it:
-						if ( method.equalsIgnoreCase( "POST" ))
-						{
-							String contentType = "";
-							String contentTypeHeader = header.getProperty("content-type");
-							StringTokenizer st = new StringTokenizer( contentTypeHeader , "; " );
-							if ( st.hasMoreTokens()) {
-								contentType = st.nextToken();
-							}
-
-							if (contentType.equalsIgnoreCase("multipart/form-data"))
-							{
-								// Handle multipart/form-data
-								if ( !st.hasMoreTokens())
-									sendError( HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html" );
-								String boundaryExp = st.nextToken();
-								st = new StringTokenizer( boundaryExp , "=" );
-								if (st.countTokens() != 2)
-									sendError( HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary syntax error. Usage: GET /example/file.html" );
-								st.nextToken();
-								String boundary = st.nextToken();
-
-								decodeMultipartData(boundary, fbuf, in, parms, files);
-							}
-							else
-							{
-								// Handle application/x-www-form-urlencoded
-								String postLine = "";
-								char pbuf[] = new char[512];
-								int read = in.read(pbuf);
-								while ( read >= 0 && !postLine.endsWith("\r\n") )
-								{
-									postLine += String.valueOf(pbuf, 0, read);
-									read = in.read(pbuf);
-								}
-								postLine = postLine.trim();
-								decodeParms( postLine, parms );
-							}
-						}
-
-						if ( method.equalsIgnoreCase( "PUT" ))
-							files.put("content", saveTmpFile( fbuf, 0, f.size()));
-
-						// Ok, now do the serve()
-						Response r = serve( uri, method, header, parms, files );
-						if ( r == null )
-							sendError( HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response." );
-						else
-							sendResponse( r.status, r.mimeType, r.header, r.data );
-
-						in.close();
-						is.close();
-					}
-					catch ( IOException ioe )
-					{
-						try
-						{
-							sendError( HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
-						}
-						catch ( Throwable t ) {}
-					}
-					catch ( InterruptedException ie )
-					{
-						// Thrown by sendError, ignore and exit the thread.
-					}
-				}
-			});
+			Thread t = new Thread( this );
 			t.setDaemon( true );
-			t.setName("NanoHttpd Main Listener 2");
 			t.start();
 		}
 
-		
+		public void run()
+		{
+			try
+			{
+				InputStream is = mySocket.getInputStream();
+				if ( is == null) return;
+
+				// Read the first 8192 bytes.
+				// The full header should fit in here.
+				// Apache's default header limit is 8KB.
+				// Do NOT assume that a single read will get the entire header at once!
+				final int bufsize = 8192;
+				byte[] buf = new byte[bufsize];
+				int splitbyte = 0;
+				int rlen = 0;
+				{
+					int read = is.read(buf, 0, bufsize);
+					while (read > 0)
+					{
+						rlen += read;
+						splitbyte = findHeaderEnd(buf, rlen);
+						if (splitbyte > 0)
+							break;
+						read = is.read(buf, rlen, bufsize - rlen);
+					}
+				}
+
+				// Create a BufferedReader for parsing the header.
+				ByteArrayInputStream hbis = new ByteArrayInputStream(buf, 0, rlen);
+				BufferedReader hin = new BufferedReader( new InputStreamReader( hbis ));
+				Properties pre = new Properties();
+				Properties parms = new Properties();
+				Properties header = new Properties();
+				Properties files = new Properties();
+
+				// Decode the header into parms and header java properties
+				decodeHeader(hin, pre, parms, header);
+				String method = pre.getProperty("method");
+				String uri = pre.getProperty("uri");
+
+				long size = 0x7FFFFFFFFFFFFFFFl;
+				String contentLength = header.getProperty("content-length");
+				if (contentLength != null)
+				{
+					try { size = Integer.parseInt(contentLength); }
+					catch (NumberFormatException ex) {}
+				}
+
+				// Write the part of body already read to ByteArrayOutputStream f
+				ByteArrayOutputStream f = new ByteArrayOutputStream();
+				if (splitbyte < rlen)
+					f.write(buf, splitbyte, rlen-splitbyte);
+
+				// While Firefox sends on the first read all the data fitting
+				// our buffer, Chrome and Opera send only the headers even if
+				// there is data for the body. We do some magic here to find
+				// out whether we have already consumed part of body, if we
+				// have reached the end of the data to be sent or we should
+				// expect the first byte of the body at the next read.
+				if (splitbyte < rlen)
+					size -= rlen-splitbyte+1;
+				else if (splitbyte==0 || size == 0x7FFFFFFFFFFFFFFFl)
+					size = 0;
+
+				// Now read all the body and write it to f
+				buf = new byte[512];
+				while ( rlen >= 0 && size > 0 )
+				{
+					rlen = is.read(buf, 0, 512);
+					size -= rlen;
+					if (rlen > 0)
+						f.write(buf, 0, rlen);
+				}
+
+				// Get the raw body as a byte []
+				byte [] fbuf = f.toByteArray();
+
+				// Create a BufferedReader for easily reading it as string.
+				ByteArrayInputStream bin = new ByteArrayInputStream(fbuf);
+				BufferedReader in = new BufferedReader( new InputStreamReader(bin));
+
+				// If the method is POST, there may be parameters
+				// in data section, too, read it:
+				if ( method.equalsIgnoreCase( "POST" ))
+				{
+					String contentType = "";
+					String contentTypeHeader = header.getProperty("content-type");
+					StringTokenizer st = new StringTokenizer( contentTypeHeader , "; " );
+					if ( st.hasMoreTokens()) {
+						contentType = st.nextToken();
+					}
+
+					if (contentType.equalsIgnoreCase("multipart/form-data"))
+					{
+						// Handle multipart/form-data
+						if ( !st.hasMoreTokens())
+							sendError( HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary missing. Usage: GET /example/file.html" );
+						String boundaryExp = st.nextToken();
+						st = new StringTokenizer( boundaryExp , "=" );
+						if (st.countTokens() != 2)
+							sendError( HTTP_BADREQUEST, "BAD REQUEST: Content type is multipart/form-data but boundary syntax error. Usage: GET /example/file.html" );
+						st.nextToken();
+						String boundary = st.nextToken();
+
+						decodeMultipartData(boundary, fbuf, in, parms, files);
+					}
+					else
+					{
+						// Handle application/x-www-form-urlencoded
+						String postLine = "";
+						char pbuf[] = new char[512];
+						int read = in.read(pbuf);
+						while ( read >= 0 && !postLine.endsWith("\r\n") )
+						{
+							postLine += String.valueOf(pbuf, 0, read);
+							read = in.read(pbuf);
+						}
+						postLine = postLine.trim();
+						decodeParms( postLine, parms );
+					}
+				}
+
+				if ( method.equalsIgnoreCase( "PUT" ))
+					files.put("content", saveTmpFile( fbuf, 0, f.size()));
+
+				// Ok, now do the serve()
+				Response r = serve( uri, method, header, parms, files );
+				if ( r == null )
+					sendError( HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: Serve() returned a null response." );
+				else
+					sendResponse( r.status, r.mimeType, r.header, r.data );
+
+				in.close();
+				is.close();
+			}
+			catch ( IOException ioe )
+			{
+				try
+				{
+					sendError( HTTP_INTERNALERROR, "SERVER INTERNAL ERROR: IOException: " + ioe.getMessage());
+				}
+				catch ( Throwable t ) {}
+			}
+			catch ( InterruptedException ie )
+			{
+				// Thrown by sendError, ignore and exit the thread.
+			}
+		}
 
 		/**
 		 * Decodes the sent headers and loads the data into
@@ -861,7 +785,6 @@ public class NanoHTTPD
 			}
 				}
 
-
 		/**
 		 * Returns an error message as a HTTP response and
 		 * throws InterruptedException to stop further request processing.
@@ -973,97 +896,6 @@ public class NanoHTTPD
 	 * Serves file from homeDir and its' subdirectories (only).
 	 * Uses only URI, ignores all headers and HTTP parameters.
 	 */
-
-
-
-
-
-
-
-	public Response serveJavascript( String uri, Properties header, AndroidFile homeDir,
-			boolean allowDirectoryListing )
-	{
-		Log.d(this.getClass().getName(), "danielLog entrou serveJavascript() NanoHTTPD.java");
-		Response res = null;
-		
-
-
-		String requestUUID = UUID.randomUUID().toString();
-
-		PluginResult pluginResult = null;
-        try {
-
-
-            //Aqui cria o JSON com informação do request
-        	Log.d(this.getClass().getName(), "danielLog serveFile: try new pluginResult NanoHTTPD.java");
-            pluginResult = new PluginResult(
-                    PluginResult.Status.OK, this.createJSONRequest(requestUUID, uri, header));
-
-            Log.d(this.getClass().getName(), "danielLog NanoHTTPD.java, pluginResult:" + pluginResult.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        	Log.d(this.getClass().getName(), "danielLog antes setKeepCallback NanoHTTPD.java");
-
-        pluginResult.setKeepCallback(true);
-        	//Log.d(this.getClass().getName(), "danielLog onRequestCallbackContext:" + this.corhttpd.onRequestCallbackContext.toString());
-        	Log.d(this.getClass().getName(), "danielLogxxxxx depois setKeepCallback NanoHTTPD.java");
-        	//Log.d(this.getClass().getName(), "danielLog onRequestCallbackContext:" + this.corhttpd.onRequestCallbackContext.toString());
-
-        this.corhttpd.onRequestCallbackContext.sendPluginResult(pluginResult);
-
-        Log.d(this.getClass().getName(), "danielLog serveFile() NanoHTTPD.java, depois sendPluginResult");
-		Log.d(this.getClass().getName(), "danielLog onRequestCallbackContext:" + this.corhttpd.onRequestCallbackContext.toString());
-
-        while (!this.corhttpd.responses.containsKey(requestUUID)) {
-        	Log.d(this.getClass().getName(), " while !responses NanoHTTPD.java");
-            try {
-            	Log.d(this.getClass().getName(), " antes thread.sleep(1) NanoHTTPD.java");
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        //ACHO QUE É AQUI QUE ESTÁ A CRIAR UMA NOVA RESPONSE
-        Log.d(this.getClass().getName(), "danielLog serveFile() antes criar responseObject, NanoHTTPD.java");
-        JSONObject responseObject = (JSONObject) this.corhttpd.responses.get(requestUUID);
-        Log.d(this.getClass().getName(), "responseObject: " + responseObject.toString());
-        Response response = null;
-
-         try{
-         	String dataBody = responseObject.getString("body");
-         	InputStream inputDataStream = new ByteArrayInputStream(dataBody.getBytes());
-
-         	response = new Response(
-                //Response.status.lookup(responseObject.getInt("status")),
-                HTTP_OK,
-                "text/plain",
-                inputDataStream
-            );
-
-            Iterator<?> keys = responseObject.getJSONObject("headers").keys();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                Log.d(this.getClass().getName(), "key: " + key);
-                Log.d(this.getClass().getName(), "responseObject: " + responseObject.toString());
-                response.addHeader(
-                    key,
-                    responseObject.getJSONObject("headers").getString(key)
-                );
-            }
-         }catch (JSONException e) {
-             e.printStackTrace();
-         }
-
-        Log.d(this.getClass().getName(), "danielLog main NanoHTTPD.java");
-        return response;
-
-
-	}
-
-
 	public Response serveFile( String uri, Properties header, AndroidFile homeDir,
 			boolean allowDirectoryListing )
 	{
@@ -1089,18 +921,8 @@ public class NanoHTTPD
 
 		AndroidFile f = new AndroidFile( homeDir, uri );
 		if ( res == null && !f.exists())
-		{
-			//if( uri.indexOf( "xpto" ) >= 0  )
-			if( uri.equals( "/xpto" ) )
-			{
-				res = new Response( HTTP_NOTFOUND, MIME_PLAINTEXT,
-					"Hello world!" );
-			}else
-			{
-				res = new Response( HTTP_NOTFOUND, MIME_PLAINTEXT,
-					"Error 404, ficheiro nao encontrado." );
-			}
-		}
+			res = new Response( HTTP_NOTFOUND, MIME_PLAINTEXT,
+					"Error 404, file not found." );
 
 		// List the directory, if necessary
 		if ( res == null && f.isDirectory())
@@ -1273,7 +1095,6 @@ public class NanoHTTPD
 		res.addHeader( "Accept-Ranges", "bytes"); // Announce that the file server accepts partial content requestes
 		return res;
 	}
-
 
 	/**
 	 * Hashtable mapping (String)FILENAME_EXTENSION -> (String)MIME_TYPE

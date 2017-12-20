@@ -5,12 +5,11 @@ import java.net.InetSocketAddress;
 
 public class WebServer extends NanoHTTPD
 {
-	
-	public WebServer(InetSocketAddress localAddr, AndroidFile wwwroot, CorHttpd s) throws IOException {
-		super(localAddr, wwwroot, s);
+	public WebServer(InetSocketAddress localAddr, AndroidFile wwwroot) throws IOException {
+		super(localAddr, wwwroot);
 	}
 
-	public WebServer(int port, AndroidFile wwwroot, CorHttpd s ) throws IOException {
-		super(port, wwwroot, s);
+	public WebServer(int port, AndroidFile wwwroot ) throws IOException {
+		super(port, wwwroot);
 	}
 }
