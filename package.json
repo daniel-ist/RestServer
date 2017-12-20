@@ -38,7 +38,7 @@
   "_where": "C:\\Users\\danie\\Desktop\\Projectos\\servidor5\\servidor5\\node_modules",
   "author": "",
   "bugs": {
-    "url": "https://github.com/floatinghotpot/cordova-httpd/issues"
+    "url": "https://github.com/daniel-ist/cordova-RestServer/issues"
   },
   "dependencies": {},
   "description": "Supported platform:\r * iOS\r * Android",
@@ -47,7 +47,7 @@
     "test": "test"
   },
   "gitHead": "78b9818516842650a9bd59881cbb543db2848d29",
-  "homepage": "https://github.com/floatinghotpot/cordova-httpd#readme",
+  "homepage": "https://github.com/daniel-ist/cordova-RestServer/#readme",
   "license": "ISC",
   "main": "index.js",
   "name": "cordova-httpd",
@@ -56,7 +56,7 @@
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/floatinghotpot/cordova-httpd.git"
+    "url": "git+https://github.com/daniel-ist/cordova-RestServer/.git"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
